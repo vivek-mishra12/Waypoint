@@ -6,25 +6,59 @@ const priorityColor = {
   high: 'border-l-amber',
 }
 
-export default function TaskCard({ task, members, onChangeStatus, onAssign, onDelete }) {
+export default function TaskCard({
+  task,
+  members,
+  onChangeStatus,
+  onToggleComplete,
+  onAssign,
+  onDelete,
+}) {
+  const isDone = task.isCompleted || task.status === 'done'
+
   return (
-    <div className={`bg-white border border-blueprint-light border-l-4 ${priorityColor[task.priority]} px-3.5 py-3 mb-3`}>
+    <div
+      className={`bg-white border border-blueprint-light border-l-4 ${
+        priorityColor[task.priority] || 'border-l-blueprint'
+      } px-3.5 py-3 mb-3 transition-opacity ${isDone ? 'opacity-75 bg-paper/50' : ''}`}
+    >
       <div className="flex items-start justify-between gap-2 mb-2">
-        <p className="text-sm text-ink font-medium leading-snug">{task.title}</p>
+        <label className="flex items-start gap-2.5 cursor-pointer flex-1 min-w-0">
+          <input
+            type="checkbox"
+            checked={Boolean(isDone)}
+            onChange={() => onToggleComplete && onToggleComplete(task._id)}
+            className="mt-0.5 h-4 w-4 rounded border-blueprint-light text-blueprint focus:ring-blueprint cursor-pointer shrink-0"
+          />
+          <span
+            className={`text-sm font-medium leading-snug break-words ${
+              isDone ? 'line-through text-ink-soft' : 'text-ink'
+            }`}
+          >
+            {task.title}
+          </span>
+        </label>
+
         <button
           onClick={() => onDelete(task._id)}
           aria-label="Delete task"
-          className="text-ink-soft/60 hover:text-amber text-sm leading-none shrink-0"
+          className="text-ink-soft/60 hover:text-amber text-sm leading-none shrink-0 ml-1"
         >
           ×
         </button>
       </div>
 
       {task.description && (
-        <p className="text-xs text-ink-soft mb-3 line-clamp-3">{task.description}</p>
+        <p
+          className={`text-xs mb-3 line-clamp-3 pl-6.5 ${
+            isDone ? 'text-ink-soft/60 line-through' : 'text-ink-soft'
+          }`}
+        >
+          {task.description}
+        </p>
       )}
 
-      <div className="flex items-center justify-between gap-2 mt-2">
+      <div className="flex items-center justify-between gap-2 mt-2 pt-1 border-t border-blueprint-light/40">
         <select
           value={task.assignee?._id || ''}
           onChange={(e) => onAssign(task._id, e.target.value)}

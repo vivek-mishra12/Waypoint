@@ -48,6 +48,8 @@ const createTask = async (req, res, next) => {
       title,
       description,
       priority,
+      status: 'todo',
+      isCompleted: false,
       assignee: assignee || null,
       dueDate: dueDate || null,
       createdBy: req.user._id,
@@ -69,13 +71,42 @@ const updateTask = async (req, res, next) => {
     const { error } = await assertMember(task.project, req.user._id);
     if (error) return res.status(error.status).json({ message: error.message });
 
-    const { title, description, status, priority, assignee, dueDate } = req.body;
+    const { title, description, status, priority, assignee, dueDate, isCompleted } = req.body;
     if (title !== undefined) task.title = title;
     if (description !== undefined) task.description = description;
-    if (status !== undefined) task.status = status;
     if (priority !== undefined) task.priority = priority;
     if (assignee !== undefined) task.assignee = assignee || null;
     if (dueDate !== undefined) task.dueDate = dueDate || null;
+
+    // Synchronize isCompleted and status
+    if (isCompleted !== undefined) {
+      task.isCompleted = isCompleted;
+      task.status = isCompleted ? 'done' : 'todo';
+    } else if (status !== undefined) {
+      task.status = status;
+      task.isCompleted = status === 'done';
+    }
+
+    await task.save();
+    const populated = await task.populate('assignee createdBy', 'name email');
+    res.json(populated);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// PATCH /api/tasks/:id/toggle
+const toggleTask = async (req, res, next) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) return res.status(404).json({ message: 'Task not found' });
+
+    const { error } = await assertMember(task.project, req.user._id);
+    if (error) return res.status(error.status).json({ message: error.message });
+
+    // Flip completion boolean and sync status
+    task.isCompleted = !task.isCompleted;
+    task.status = task.isCompleted ? 'done' : 'todo';
 
     await task.save();
     const populated = await task.populate('assignee createdBy', 'name email');
@@ -101,4 +132,4 @@ const deleteTask = async (req, res, next) => {
   }
 };
 
-module.exports = { getTasks, createTask, updateTask, deleteTask };
+module.exports = { getTasks, createTask, updateTask, toggleTask, deleteTask };

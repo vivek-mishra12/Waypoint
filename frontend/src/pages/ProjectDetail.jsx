@@ -47,6 +47,11 @@ export default function ProjectDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
+  // Dynamic progress calculation based on tasks completed or in "done" status
+  const totalTasks = tasks.length
+  const completedTasks = tasks.filter((t) => t.isCompleted || t.status === 'done').length
+  const progressPercent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100)
+
   const handleCreateTask = async (e) => {
     e.preventDefault()
     setTaskError('')
@@ -70,9 +75,36 @@ export default function ProjectDetail() {
   }
 
   const handleChangeStatus = async (taskId, status) => {
-    setTasks((prev) => prev.map((t) => (t._id === taskId ? { ...t, status } : t)))
+    const isCompleted = status === 'done'
+    setTasks((prev) =>
+      prev.map((t) => (t._id === taskId ? { ...t, status, isCompleted } : t))
+    )
     try {
-      await api.put(`/tasks/${taskId}`, { status })
+      await api.put(`/tasks/${taskId}`, { status, isCompleted })
+    } catch (err) {
+      loadAll()
+    }
+  }
+
+  const handleToggleComplete = async (taskId) => {
+    // Optimistic UI update
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (t._id === taskId) {
+          const nextCompleted = !(t.isCompleted || t.status === 'done')
+          return {
+            ...t,
+            isCompleted: nextCompleted,
+            status: nextCompleted ? 'done' : 'todo',
+          }
+        }
+        return t
+      })
+    )
+
+    try {
+      const { data } = await api.patch(`/tasks/${taskId}/toggle`)
+      setTasks((prev) => prev.map((t) => (t._id === taskId ? data : t)))
     } catch (err) {
       loadAll()
     }
@@ -137,7 +169,8 @@ export default function ProjectDetail() {
         ← All projects
       </Link>
 
-      <div className="flex items-start justify-between mt-3 mb-8">
+      {/* Header with Title and Actions */}
+      <div className="flex items-start justify-between mt-3 mb-4">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink">{project.name}</h1>
           {project.description && (
@@ -160,6 +193,23 @@ export default function ProjectDetail() {
         </div>
       </div>
 
+      {/* Progress Bar & Summary */}
+      <div className="bg-white border border-blueprint-light p-4 mb-8">
+        <div className="flex items-center justify-between text-xs text-ink font-medium mb-2">
+          <span>Overall Project Progress</span>
+          <span className="font-semibold text-blueprint">
+            {progressPercent}% ({completedTasks}/{totalTasks} tasks completed)
+          </span>
+        </div>
+        <div className="w-full bg-paper h-2 overflow-hidden border border-blueprint-light/60">
+          <div
+            className="bg-blueprint h-full transition-all duration-300"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Kanban Columns */}
       <div className="flex gap-6 overflow-x-auto pb-4">
         {columns.map((col) => (
           <TaskColumn
@@ -168,12 +218,14 @@ export default function ProjectDetail() {
             tasks={tasks.filter((t) => t.status === col.key)}
             members={project.members}
             onChangeStatus={handleChangeStatus}
+            onToggleComplete={handleToggleComplete}
             onAssign={handleAssign}
             onDelete={handleDeleteTask}
           />
         ))}
       </div>
 
+      {/* New Task Modal */}
       {showNewTask && (
         <Modal title="New task" onClose={() => setShowNewTask(false)}>
           {taskError && (
@@ -233,6 +285,7 @@ export default function ProjectDetail() {
         </Modal>
       )}
 
+      {/* Team Members Modal */}
       {showMembers && (
         <Modal title="Team members" onClose={() => setShowMembers(false)}>
           <ul className="space-y-2 mb-5">

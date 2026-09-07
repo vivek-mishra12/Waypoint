@@ -7,7 +7,25 @@ const statusLabel = {
   completed: 'Completed',
 }
 
-export default function ProjectCard({ project }) {
+export default function ProjectCard({ project, tasks = [] }) {
+  // If the project model already provides precalculated progress, use it;
+  // otherwise, calculate dynamically from tasks belonging to this project
+  const projectTasks = tasks.length > 0 
+    ? tasks.filter((t) => (t.project?._id || t.project) === project._id) 
+    : []
+
+  const totalTasks = projectTasks.length > 0 ? projectTasks.length : (project.taskCount ?? 0)
+  const completedTasks = projectTasks.filter(
+    (t) => t.isCompleted || t.status === 'done' || t.status === 'completed'
+  ).length
+
+  const progress = projectTasks.length > 0
+    ? Math.round((completedTasks / totalTasks) * 100)
+    : (project.progress ?? 0)
+
+  // Clamp percentage between 0 and 100
+  const clampedProgress = Math.min(100, Math.max(0, progress))
+
   return (
     <Link
       to={`/projects/${project._id}`}
@@ -27,19 +45,23 @@ export default function ProjectCard({ project }) {
       <div className="mb-3">
         <div className="flex items-center justify-between text-xs text-ink-soft mb-1">
           <span>Progress</span>
-          <span className="font-mono">{project.progress}%</span>
+          <span className="font-mono">{clampedProgress}%</span>
         </div>
-        <div className="h-1.5 bg-blueprint-light/50 w-full">
+        <div className="h-1.5 bg-blueprint-light/50 w-full overflow-hidden">
           <div
-            className="h-1.5 bg-blueprint"
-            style={{ width: `${project.progress}%` }}
+            className="h-1.5 bg-blueprint transition-all duration-300"
+            style={{ width: `${clampedProgress}%` }}
           />
         </div>
       </div>
 
       <div className="flex items-center justify-between text-xs text-ink-soft">
-        <span>{project.taskCount} task{project.taskCount === 1 ? '' : 's'}</span>
-        <span>{project.members?.length || 0} member{project.members?.length === 1 ? '' : 's'}</span>
+        <span>
+          {totalTasks} task{totalTasks === 1 ? '' : 's'}
+        </span>
+        <span>
+          {project.members?.length || 0} member{project.members?.length === 1 ? '' : 's'}
+        </span>
       </div>
     </Link>
   )

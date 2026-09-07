@@ -1,7 +1,15 @@
 import React from 'react'
 import TaskCard from './TaskCard.jsx'
 
-export default function TaskColumn({ title, tasks, members, onChangeStatus, onAssign, onDelete }) {
+export default function TaskColumn({
+  title,
+  tasks,
+  members,
+  onChangeStatus,
+  onToggleComplete,
+  onAssign,
+  onDelete,
+}) {
   return (
     <div className="flex-1 min-w-[260px]">
       <div className="flex items-center justify-between border-b-2 border-ink pb-2 mb-4">
@@ -17,6 +25,7 @@ export default function TaskColumn({ title, tasks, members, onChangeStatus, onAs
             task={t}
             members={members}
             onChangeStatus={onChangeStatus}
+            onToggleComplete={onToggleComplete}
             onAssign={onAssign}
             onDelete={onDelete}
           />

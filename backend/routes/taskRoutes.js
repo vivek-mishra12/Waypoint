@@ -1,5 +1,5 @@
 const express = require('express');
-const { updateTask, deleteTask } = require('../controllers/taskController');
+const { updateTask, deleteTask, toggleTask } = require('../controllers/taskController');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
@@ -7,5 +7,6 @@ const router = express.Router();
 router.use(protect);
 
 router.route('/:id').put(updateTask).delete(deleteTask);
+router.patch('/:id/toggle', toggleTask);
 
 module.exports = router;
