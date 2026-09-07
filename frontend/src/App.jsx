@@ -13,7 +13,7 @@ function ProtectedRoute({ children }) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-paper text-ink-soft font-body">
-        Loading NOVA…
+        Loading Waypoint…
       </div>
     )
   }
