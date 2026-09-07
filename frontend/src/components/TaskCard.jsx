@@ -8,13 +8,14 @@ const priorityColor = {
 
 export default function TaskCard({
   task,
-  members,
+  members = [],
   onChangeStatus,
   onToggleComplete,
   onAssign,
   onDelete,
 }) {
-  const isDone = task.isCompleted || task.status === 'done'
+  const isDone = Boolean(task.isCompleted || task.status === 'done')
+  const assigneeId = task.assignee?._id || task.assignee || ''
 
   return (
     <div
@@ -26,12 +27,12 @@ export default function TaskCard({
         <label className="flex items-start gap-2.5 cursor-pointer flex-1 min-w-0">
           <input
             type="checkbox"
-            checked={Boolean(isDone)}
+            checked={isDone}
             onChange={() => onToggleComplete && onToggleComplete(task._id)}
             className="mt-0.5 h-4 w-4 rounded border-blueprint-light text-blueprint focus:ring-blueprint cursor-pointer shrink-0"
           />
           <span
-            className={`text-sm font-medium leading-snug break-words ${
+            className={`text-sm font-medium leading-snug break-words select-none ${
               isDone ? 'line-through text-ink-soft' : 'text-ink'
             }`}
           >
@@ -40,9 +41,10 @@ export default function TaskCard({
         </label>
 
         <button
-          onClick={() => onDelete(task._id)}
+          type="button"
+          onClick={() => onDelete && onDelete(task._id)}
           aria-label="Delete task"
-          className="text-ink-soft/60 hover:text-amber text-sm leading-none shrink-0 ml-1"
+          className="text-ink-soft/60 hover:text-amber text-lg leading-none shrink-0 ml-1 cursor-pointer"
         >
           ×
         </button>
@@ -60,9 +62,9 @@ export default function TaskCard({
 
       <div className="flex items-center justify-between gap-2 mt-2 pt-1 border-t border-blueprint-light/40">
         <select
-          value={task.assignee?._id || ''}
-          onChange={(e) => onAssign(task._id, e.target.value)}
-          className="text-xs border border-blueprint-light bg-paper px-1.5 py-1 focus:outline-none focus:border-blueprint max-w-[45%]"
+          value={assigneeId}
+          onChange={(e) => onAssign && onAssign(task._id, e.target.value)}
+          className="text-xs border border-blueprint-light bg-paper px-1.5 py-1 focus:outline-none focus:border-blueprint max-w-[45%] cursor-pointer"
         >
           <option value="">Unassigned</option>
           {members.map((m) => (
@@ -73,9 +75,9 @@ export default function TaskCard({
         </select>
 
         <select
-          value={task.status}
-          onChange={(e) => onChangeStatus(task._id, e.target.value)}
-          className="text-xs border border-blueprint-light bg-paper px-1.5 py-1 focus:outline-none focus:border-blueprint"
+          value={task.status || 'todo'}
+          onChange={(e) => onChangeStatus && onChangeStatus(task._id, e.target.value)}
+          className="text-xs border border-blueprint-light bg-paper px-1.5 py-1 focus:outline-none focus:border-blueprint cursor-pointer"
         >
           <option value="todo">To do</option>
           <option value="in-progress">In progress</option>
