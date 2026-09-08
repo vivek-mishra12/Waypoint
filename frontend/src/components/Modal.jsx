@@ -1,28 +1,111 @@
-import React from 'react'
+import React from "react";
 
-export default function Modal({ title, onClose, children }) {
+export default function Modal({
+  title,
+  onClose,
+  children,
+}) {
+
   return (
     <div
-      className="fixed inset-0 bg-ink/40 flex items-center justify-center px-4 z-50"
+      className="
+        fixed
+        inset-0
+
+        z-[100]
+
+        bg-black/70
+
+        backdrop-blur-sm
+
+        grid
+        place-items-center
+
+        px-4
+        py-6
+
+        animate-in
+      "
       onClick={onClose}
     >
+
       <div
-        className="w-full max-w-md bg-paper border border-blueprint-light sheet-corners px-6 py-6 relative z-10"
-        onClick={(e) => e.stopPropagation()}
+        className="
+          w-full
+          max-w-lg
+
+          glass
+
+          rounded-3xl
+
+          p-6
+
+          shadow-2xl
+          shadow-black/40
+        "
+        onClick={(event) =>
+          event.stopPropagation()
+        }
       >
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="font-display text-lg font-semibold text-ink">{title}</h2>
+
+        {/* Header */}
+
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            mb-6
+          "
+        >
+
+          <div>
+
+            <p
+              className="
+                text-[10px]
+                uppercase
+                tracking-[.2em]
+                text-indigo-300/70
+                mb-1
+              "
+            >
+              Waypoint
+            </p>
+
+            <h2 className="text-xl font-semibold">
+              {title}
+            </h2>
+
+          </div>
+
           <button
-            type="button"
             onClick={onClose}
-            aria-label="Close"
-            className="text-ink-soft hover:text-ink text-lg leading-none cursor-pointer p-1"
+            className="
+              h-9
+              w-9
+
+              rounded-xl
+
+              bg-white/[.04]
+
+              hover:bg-white/[.08]
+
+              text-slate-400
+              hover:text-white
+
+              transition-colors
+            "
           >
             ×
           </button>
+
         </div>
+
         {children}
+
       </div>
+
     </div>
-  )
+  );
 }

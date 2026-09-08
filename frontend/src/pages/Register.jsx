@@ -1,102 +1,385 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext.jsx'
+import React, {
+  useState,
+} from "react";
+
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
+
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Register() {
-  const { register } = useAuth()
-  const navigate = useNavigate()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-    setSubmitting(true)
-    try {
-      await register(name, email, password)
-      navigate('/')
-    } catch (err) {
-      setError(err.response?.data?.message || 'Could not create your account. Try again.')
-    } finally {
-      setSubmitting(false)
-    }
-  }
+  const {
+    register,
+  } = useAuth();
+
+  const navigate =
+    useNavigate();
+
+  const [name, setName] =
+    useState("");
+
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
+
+  const [error, setError] =
+    useState("");
+
+  const [submitting, setSubmitting] =
+    useState(false);
+
+  const handleSubmit =
+    async (event) => {
+
+      event.preventDefault();
+
+      setError("");
+      setSubmitting(true);
+
+      try {
+
+        await register(
+          name,
+          email,
+          password
+        );
+
+        navigate("/");
+
+      } catch (err) {
+
+        setError(
+          err.response?.data?.message ||
+            "Could not create your account. Try again."
+        );
+
+      } finally {
+
+        setSubmitting(false);
+
+      }
+    };
 
   return (
-    <div className="min-h-screen bg-paper blueprint-grid flex items-center justify-center px-4 font-body">
-      <div className="w-full max-w-sm bg-paper border border-blueprint-light sheet-corners px-8 py-10">
-        <h1 className="font-display text-2xl font-semibold text-ink mb-1">Waypoint</h1>
-        <p className="text-sm text-ink-soft mb-8">Create your team workspace</p>
+    <div
+      className="
+        min-h-screen
 
-        {error && (
-          <div className="mb-5 border-l-2 border-amber bg-amber/5 px-3 py-2 text-sm text-ink">
-            {error}
-          </div>
-        )}
+        app-bg
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs text-ink-soft mb-1" htmlFor="name">
-              Full name
-            </label>
-            <input
-              id="name"
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full border border-blueprint-light px-3 py-2 text-sm bg-white focus:outline-none focus:border-blueprint"
-              placeholder="Ada Lovelace"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-ink-soft mb-1" htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-blueprint-light px-3 py-2 text-sm bg-white focus:outline-none focus:border-blueprint"
-              placeholder="you@company.com"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-ink-soft mb-1" htmlFor="password">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-blueprint-light px-3 py-2 text-sm bg-white focus:outline-none focus:border-blueprint"
-              placeholder="At least 6 characters"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-blueprint text-white text-sm font-medium py-2.5 mt-2 hover:bg-ink transition-colors disabled:opacity-60"
+        grid-bg
+
+        flex
+
+        items-center
+        justify-center
+
+        p-5
+      "
+    >
+
+      <div
+        className="
+          w-full
+          max-w-md
+
+          animate-in
+        "
+      >
+
+        {/* LOGO */}
+
+        <div
+          className="
+            flex
+            items-center
+            gap-3
+
+            mb-6
+          "
+        >
+
+          <span
+            className="
+              h-10
+              w-10
+
+              rounded-xl
+
+              bg-gradient-to-br
+              from-indigo-500
+              to-violet-600
+
+              grid
+              place-items-center
+            "
           >
-            {submitting ? 'Creating account…' : 'Create account'}
-          </button>
-        </form>
+            ✦
+          </span>
 
-        <p className="text-sm text-ink-soft mt-6">
-          Already have an account?{' '}
-          <Link to="/login" className="text-blueprint hover:text-ink">
-            Sign in
-          </Link>
-        </p>
+          <span
+            className="
+              font-bold
+              text-lg
+            "
+          >
+            Waypoint
+          </span>
+
+        </div>
+
+        {/* CARD */}
+
+        <div
+          className="
+            glass
+
+            rounded-3xl
+
+            p-7
+            sm:p-9
+
+            glow
+          "
+        >
+
+          <p
+            className="
+              text-[10px]
+
+              uppercase
+
+              tracking-[.22em]
+
+              text-indigo-300/70
+
+              mb-2
+            "
+          >
+            Get started
+          </p>
+
+          <h1
+            className="
+              text-2xl
+              font-bold
+            "
+          >
+            Create your workspace
+          </h1>
+
+          <p
+            className="
+              text-sm
+              text-slate-500
+
+              mt-2
+
+              mb-7
+            "
+          >
+            Bring your team and projects
+            into one focused place.
+          </p>
+
+          {/* ERROR */}
+
+          {error && (
+            <div
+              className="
+                mb-5
+
+                rounded-xl
+
+                border
+                border-rose-400/10
+
+                bg-rose-500/10
+
+                text-rose-300
+
+                px-4
+                py-3
+
+                text-sm
+              "
+            >
+              {error}
+            </div>
+          )}
+
+          {/* FORM */}
+
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+          >
+
+            {/* NAME */}
+
+            <FormField label="Full name">
+
+              <input
+                required
+                value={name}
+                onChange={(event) =>
+                  setName(
+                    event.target.value
+                  )
+                }
+                className="field"
+                placeholder="Ada Lovelace"
+              />
+
+            </FormField>
+
+            {/* EMAIL */}
+
+            <FormField label="Email">
+
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(event) =>
+                  setEmail(
+                    event.target.value
+                  )
+                }
+                className="field"
+                placeholder="you@company.com"
+              />
+
+            </FormField>
+
+            {/* PASSWORD */}
+
+            <FormField label="Password">
+
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(event) =>
+                  setPassword(
+                    event.target.value
+                  )
+                }
+                className="field"
+                placeholder="At least 6 characters"
+              />
+
+            </FormField>
+
+            {/* SUBMIT */}
+
+            <button
+              disabled={submitting}
+              className="
+                w-full
+
+                rounded-xl
+
+                bg-indigo-500
+
+                hover:bg-indigo-400
+
+                py-3
+
+                text-sm
+                font-semibold
+
+                shadow-lg
+                shadow-indigo-500/20
+
+                transition-all
+
+                hover:-translate-y-0.5
+
+                disabled:opacity-50
+
+                disabled:hover:translate-y-0
+              "
+            >
+              {submitting
+                ? "Creating account..."
+                : "Create account"}
+            </button>
+
+          </form>
+
+          {/* LOGIN */}
+
+          <p
+            className="
+              text-sm
+              text-slate-500
+
+              mt-6
+
+              text-center
+            "
+          >
+            Already have an account?{" "}
+
+            <Link
+              to="/login"
+              className="
+                text-indigo-300
+
+                hover:text-white
+
+                transition-colors
+              "
+            >
+              Sign in
+            </Link>
+
+          </p>
+
+        </div>
+
       </div>
+
     </div>
-  )
+  );
+}
+
+
+/* --------------------------------
+   Form field
+-------------------------------- */
+
+function FormField({
+  label,
+  children,
+}) {
+
+  return (
+    <label className="block">
+
+      <span
+        className="
+          block
+
+          text-xs
+          font-medium
+          text-slate-400
+
+          mb-2
+        "
+      >
+        {label}
+      </span>
+
+      {children}
+
+    </label>
+  );
 }
